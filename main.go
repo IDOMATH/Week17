@@ -15,13 +15,15 @@ func main() {
 
 func handlePostMongo(w http.ResponseWriter, r *http.Request) {
 	// form fields are startDate, endDate, minCount, maxCount
+	w.Write([]byte("Posting to Mongo"))
 }
 
 func handlePostMemstore(w http.ResponseWriter, r *http.Request) {
 	// form fields are key, value
+	w.Write([]byte("Posting to memstore"))
 }
 
 func handleGetMemstore(w http.ResponseWriter, r *http.Request) {
 	key := r.URL.Query().Get("key")
-	fmt.Println("key: ", key)
+	w.Write([]byte(fmt.Sprintf("key: %s", key)))
 }
