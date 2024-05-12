@@ -3,13 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 )
 
 type memObj struct {
-	key   string `json:"key"`
-	value string `json:"value"`
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 func main() {
@@ -35,15 +36,20 @@ func handlePostMongo(w http.ResponseWriter, r *http.Request) {
 }
 
 func handlePostMemstore(memstore map[string]string) http.HandlerFunc {
-	// form fields are key, value
 	return func(w http.ResponseWriter, r *http.Request) {
 		var obj memObj
-		err := json.NewDecoder(r.Body).Decode(&obj)
+		body, err := io.ReadAll(r.Body)
 		if err != nil {
-			w.Write([]byte(err.Error()))
+			fmt.Println("Error reading request body")
 			return
 		}
-		w.Write([]byte(fmt.Sprintf("key: %s, value: %s", obj.key, obj.value)))
+		if err = json.Unmarshal(body, &obj); err != nil {
+			fmt.Println("Invalid JSON data")
+			return
+		}
+		memstore[obj.Key] = obj.Value
+		w.Write([]byte(fmt.Sprintf("key: %s, value: %s", obj.Key, obj.Value)))
+
 	}
 }
 
