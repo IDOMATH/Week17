@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"io"
 	"log"
 	"net/http"
@@ -13,7 +16,17 @@ type memObj struct {
 	Value string `json:"value"`
 }
 
+const portNumber = ":8080"
+const dbUri = "mongodb://localhost:27017"
+const mongoDbName = "week17"
+
 func main() {
+	fmt.Println("Connecting to mongo")
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(dbUri))
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	router := http.NewServeMux()
 
 	memstore := make(map[string]string)
@@ -23,7 +36,7 @@ func main() {
 	router.HandleFunc("GET /memstore", handleGetMemstore(memstore))
 
 	server := http.Server{
-		Addr:    ":8080",
+		Addr:    portNumber,
 		Handler: router,
 	}
 
