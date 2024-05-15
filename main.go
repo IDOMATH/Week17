@@ -16,9 +16,22 @@ type memObj struct {
 	Value string `json:"value"`
 }
 
+type mongoStore struct {
+	client     *mongo.Client
+	collection *mongo.Collection
+}
+
+func newMongoStore(client *mongo.Client, dbName string) *mongoStore {
+	return &mongoStore{
+		client:     client,
+		collection: client.Database(mongoDbName).Collection(mongoCollection),
+	}
+}
+
 const portNumber = ":8080"
 const dbUri = "mongodb://localhost:27017"
 const mongoDbName = "week17"
+const mongoCollection = "week17collection"
 
 func main() {
 	fmt.Println("Connecting to mongo")
