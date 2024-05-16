@@ -42,9 +42,11 @@ func main() {
 
 	router := http.NewServeMux()
 
+	mongoStore := newMongoStore(client, mongoCollection)
+
 	memstore := make(map[string]string)
 
-	router.HandleFunc("POST /mongo", handlePostMongo)
+	router.HandleFunc("POST /mongo", handlePostMongo(mongoStore))
 	router.HandleFunc("POST /memstore", handlePostMemstore(memstore))
 	router.HandleFunc("GET /memstore", handleGetMemstore(memstore))
 
@@ -56,9 +58,11 @@ func main() {
 	log.Fatal(server.ListenAndServe())
 }
 
-func handlePostMongo(w http.ResponseWriter, r *http.Request) {
-	// form fields are startDate, endDate, minCount, maxCount
-	w.Write([]byte("Posting to Mongo"))
+func handlePostMongo(store *mongoStore) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// form fields are startDate, endDate, minCount, maxCount
+		w.Write([]byte("Posting to Mongo"))
+	}
 }
 
 func handlePostMemstore(memstore map[string]string) http.HandlerFunc {
