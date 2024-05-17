@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 )
 
 type memObj struct {
@@ -16,16 +17,40 @@ type memObj struct {
 	Value string `json:"value"`
 }
 
-type mongoStore struct {
+type MongoRequest struct {
+	StartDate string
+	EndDate   string
+	MinCount  int
+	MaxCount  int
+}
+
+type MongoResponse struct {
+	Code    int
+	Msg     string
+	Records []MongoRecord
+}
+
+type MongoRecord struct {
+	Key        string
+	CreatedAt  time.Time
+	TotalCount int
+}
+
+type MongoStore struct {
 	client     *mongo.Client
 	collection *mongo.Collection
 }
 
-func newMongoStore(client *mongo.Client, dbName string) *mongoStore {
-	return &mongoStore{
+func NewMongoStore(client *mongo.Client, dbName string) *MongoStore {
+	return &MongoStore{
 		client:     client,
 		collection: client.Database(mongoDbName).Collection(mongoCollection),
 	}
+}
+
+func (s *MongoStore) InsertMongo(ctx context.Context, req MongoRequest) MongoResponse {
+	res := MongoResponse{}
+	return res
 }
 
 const portNumber = ":8080"
