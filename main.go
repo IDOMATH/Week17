@@ -49,6 +49,7 @@ func NewMongoStore(client *mongo.Client, dbName string) *MongoStore {
 }
 
 func (s *MongoStore) InsertMongo(ctx context.Context, req MongoRequest) MongoResponse {
+
 	res := MongoResponse{}
 	return res
 }
@@ -84,8 +85,20 @@ func main() {
 }
 
 func handlePostMongo(store *MongoStore) http.HandlerFunc {
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		// form fields are startDate, endDate, minCount, maxCount
+		var mongoReq MongoRequest
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			fmt.Println("Error reading request body")
+			return
+		}
+		if err = json.Unmarshal(body, &mongoReq); err != nil {
+			fmt.Println("Invalid JSON data")
+			return
+		}
+		store.InsertMongo(context.Background(), mongoReq)
 		w.Write([]byte("Posting to Mongo"))
 	}
 }
